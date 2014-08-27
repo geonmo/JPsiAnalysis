@@ -31,7 +31,7 @@ class NtupleAnalyzer(object):
               break
           #print self.isMC
           hNEvent = f.Get("fEvent/hNEvent")
-          print hNEvent
+          #print hNEvent
           if hNEvent == None: 
              continue
           self.nEventTotal += hNEvent.GetBinContent(1)
@@ -54,7 +54,7 @@ class NtupleAnalyzer(object):
 
     def addH1(self, *args):
         name, varexp, title = args[:3]
-        print name,varexp, title
+        #print name,varexp, title
         binOptions = args[3:]
         if len(binOptions) == 1:
             bins = array('d', binOptions[0])

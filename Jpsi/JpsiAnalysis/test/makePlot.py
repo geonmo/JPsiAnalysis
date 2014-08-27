@@ -13,7 +13,7 @@ label  = "#intLdt=%.1f fb^{-1}, #sqrt{s}=8TeV" % (lumi/1000)
 
 ## Load plot styles for all samples
 plotStyles = []
-xml_doc = parse("../data/samples.xml")
+xml_doc = parse("../data/sample.xml")
 for xml_proc in xml_doc.getElementsByTagName("signal") + xml_doc.getElementsByTagName("background"):
     plotColl = []
     title = xml_proc.getAttribute("title")
