@@ -9,6 +9,7 @@ process.source = cms.Source("PoolSource",
 )
 
 process.load("KrAFT.GenericNtuple.flatNtuple_cfi")
+process.load("KrAFT.GenericNtuple.flatCands_cfi")
 process.load("KrAFT.RecoSelectorTools.zSelector_cfi")
 process.load("KrAFT.GenericNtuple.flatZNtuple_cfi")
 process.passFEDM = cms.EDFilter("HLTHighLevel",
@@ -22,7 +23,18 @@ process.passFEDM = cms.EDFilter("HLTHighLevel",
 )
 
 #process.p = cms.Path(process.passFEDM+process.fEvent)
-process.p = cms.Path(process.ZToMuMuCandidates+process.ZToElElCandidates*process.fEvent)
+process.p = cms.Path( process.ZToMuMuCandidates*process.flatZMuMu
+                      +process.ZToElElCandidates*process.flatZElEl
+                      +process.fEvent
+)
+
+#process.ZToMuMuCandidates.decay = cms.string("goodMuons@+ goodMuons@-")
+
+#process.ZToElElCandidates.decay = cms.string("goodElectrons@+ goodElectrons@-")
+
+process.options = cms.untracked.PSet( 
+                    SkipEvent = cms.untracked.vstring('ProductNotFound')
+)
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
