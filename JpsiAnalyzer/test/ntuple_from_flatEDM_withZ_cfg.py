@@ -23,14 +23,10 @@ process.passFEDM = cms.EDFilter("HLTHighLevel",
 )
 
 #process.p = cms.Path(process.passFEDM+process.fEvent)
-process.p = cms.Path( process.ZToMuMuCandidates*process.flatZMuMu
+process.p = cms.Path( process.passFEDM*process.ZToMuMuCandidates*process.flatZMuMu
                       +process.ZToElElCandidates*process.flatZElEl
                       +process.fEvent
 )
-
-#process.ZToMuMuCandidates.decay = cms.string("goodMuons@+ goodMuons@-")
-
-#process.ZToElElCandidates.decay = cms.string("goodElectrons@+ goodElectrons@-")
 
 process.options = cms.untracked.PSet( 
                     SkipEvent = cms.untracked.vstring('ProductNotFound')
@@ -46,4 +42,10 @@ process.TFileService = cms.Service("TFileService",
 setattr( process.fEvent.cands,"zMuMu",process.zMuMu)
 setattr( process.fEvent.cands,"zElEl",process.zElEl)
 
+HLTMuMu = cms.PSet( src = cms.InputTag("flatEventInfo","HLTDoubleMu"))
+HLTElEl = cms.PSet( src = cms.InputTag("flatEventInfo","HLTDoubleElectron"))
+HLTMuEG = cms.PSet( src = cms.InputTag("flatEventInfo","HLTMuEG"))
 
+setattr( process.fEvent.int,"HLTMuMu",HLTMuMu)
+setattr( process.fEvent.int,"HLTElEl",HLTElEl)
+setattr( process.fEvent.int,"HLTMuEG",HLTMuEG)
