@@ -9,14 +9,14 @@ def process( sample, hltPath,files, weightVar ='puWeight') :
   ana = NtupleAnalyzer( hltPath,files,'hist/%s__%s.root'%(sample,hltPath) )
   #print ana
   ana.setWeightVar(weightVar)
-  ana.setPrecut(hltPath)
+  #ana.setPrecut(hltPath)
 
   #cut_s0="1"
   cut_s1="1"
   cut_s2="1"
-  cut_s3 = "jets_pt[0] >=30"
-  cut_s4="@jpsiMuMu_pt.size()>=1 && jpsiMuMu_m>3.0 && jpsiMuMu_m<3.2"
-  cut_s5="jpsiMuMu_l3D<2.0 && jpsiMuMu_jetDR<0.5 && jpsiMuMu_vProb>0.001"
+  #cut_s3 = "jets_pt[0] >=30"
+  #cut_s4="@jpsiMuMu_pt.size()>=1 && jpsiMuMu_m>3.0 && jpsiMuMu_m<3.2"
+  #cut_s5="jpsiMuMu_l3D<2.0 && jpsiMuMu_jetDR<0.5 && jpsiMuMu_vProb>0.001"
   if ( hltPath == "HLTMuMu" ) :
     cut_s1 = "muons_pt[0]>20. && muons_pt[1]>20. && muons_relIso[0]<0.15 && muons_relIso[1]<0.15"
     cut_s2 = "1"
@@ -28,7 +28,7 @@ def process( sample, hltPath,files, weightVar ='puWeight') :
     cut_s2 = "1"
       
   #cut_s1 = "muons_pt[0]>20 && muons_relIso[0]<0.15 && muons_pt[1]>20 && muons_relIso[1]<0.15"    
-  cut_s1 = "1"    
+  #cut_s1 = "1"    
   ana.addH1("f_electron_pt","electrons_pt[0]","Leading Electron pT",100,0. ,200. )
   ana.addH1("s_electron_pt","electrons_pt[1]","Next Leading Electron pT",100,0. ,200. )
   ana.addH1("electrons_pt","electrons_pt","Electron pT",100,0. ,200. )
@@ -50,9 +50,9 @@ def process( sample, hltPath,files, weightVar ='puWeight') :
   #ana.addCutStep("S0", cut_s0, histlist)
   ana.addCutStep("S1", cut_s1, histlist)
   ana.addCutStep("S2", cut_s2, histlist)
-  ana.addCutStep("S3", cut_s3, histlist)
-  ana.addCutStep("S4", cut_s4, histlist)
-  ana.addCutStep("S5", cut_s5, histlist)
+  #ana.addCutStep("S3", cut_s3, histlist)
+  #ana.addCutStep("S4", cut_s4, histlist)
+  #ana.addCutStep("S5", cut_s5, histlist)
   ana.process()
 
 if __name__ == '__main__' :
@@ -76,7 +76,7 @@ if __name__ == '__main__' :
   #print samples
 
   ## for test,
-  #samples ={'default':['/pnfs/user/kraft_data/sample/ntuple_mc.root']}
+  samples ={'default':['./ntuple/ntuple.root']}
   modes = ["HLTMuMu","HLTElEl","HLTMuEG"]
 
 

@@ -23,7 +23,8 @@ process.passFEDM = cms.EDFilter("HLTHighLevel",
 )
 
 #process.p = cms.Path(process.passFEDM+process.fEvent)
-process.p = cms.Path( process.passFEDM*process.ZToMuMuCandidates*process.flatZMuMu
+process.p = cms.Path( process.passFEDM
+                      *process.ZToMuMuCandidates*process.flatZMuMu
                       +process.ZToElElCandidates*process.flatZElEl
                       +process.fEvent
 )
