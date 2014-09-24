@@ -2,36 +2,52 @@
 
 from ROOT import *
 import os
-#file = TFile("/pnfs/user/kraft_data/MC/DYJetsToLL_M-10To50filter_8TeV-madgraph/ntuple_20140827.root")
-datasets=[]
-dir_mc = "/pnfs/user/kraft_data/MC"
-for x in os.listdir(dir_mc) :
-  datasets.append(dir_mc+"/"+x+"/ntuple.root")
-dataset_dict={}
-for dataset in datasets :
-  name = dataset.split('/')[-2]
-  dataset_dict[name] = dataset
+import multiprocessing
 
-for key in dataset_dict.keys()[:1] :
-  file = TFile(dataset_dict[key])
+def process( dataset, ntuple_path, channel ) :
+  expr = ""
+  if ( channel == "MuMu") :
+    expr = "HLTMuMu==1&& @muons_pt.size()>=2"
+  elif ( channel == "ElEl") :
+    expr = "HLTElEl==1 && @electrons_pt.size() >=2"
+  elif ( channel == "MuEG") :
+    expr = "HLTMuEG==1 && @electrons_pt.size() >=1&&@muons_pt.size()>=1" 
+
+  file = TFile(ntuple_path)
   tree = file.Get("fEvent/event")
-  #print key,dataset_dict[key]
-
-  filename = key+"__MuMu"+".root"
+  filename = dataset+"__"+channel+".root"
   outfile = TFile( filename,"RECREATE")
-  ntuple1 = tree.CopyTree("HLTMuMu==1&& @muons_pt.size()>=2")
-  ntuple1.Write()
+  ntuple = tree.CopyTree(expr)
+  ntuple.Write()
   outfile.Close()
 
-  filename = key+"__ElEl"+".root"
-  outfile = TFile("DYElEl.root","RECREATE")
-  ntuple2 = tree.CopyTree("HLTElEl==1 && @electrons_pt.size() >=2")
-  ntuple2.Write()
-  outfile.Close()
+#file = TFile("/pnfs/user/kraft_data/MC/DYJetsToLL_M-10To50filter_8TeV-madgraph/ntuple_20140827.root")
 
-  filename = key+"__MuEl"+".root"
-  outfile = TFile(filename,"RECREATE")
-  ntuple3 = tree.CopyTree("HLTMuEG==1 && @electrons_pt.size() >=1&&@muons_pt.size()>=1")
-  ntuple3.Write()
-  outfile.Close()
+if __name__ == '__main__' : 
 
+  datasets=[]
+
+  dir_mc = "/pnfs/user/kraft_data/MC"
+  for x in os.listdir(dir_mc) :
+    datasets.append(dir_mc+"/"+x+"/ntuple.root")
+
+  dir_rd = "/pnfs/user/kraft_data/RD"
+  for x in os.listdir(dir_rd) :
+    datasets.append(dir_rd+"/"+x+"/ntuple.root")
+
+  dataset_dict={}
+  channels = ["MuMu","ElEl","MuEG"]
+  for dataset in datasets :
+    name = dataset.split('/')[-2]
+    dataset_dict[name] = dataset
+
+  p = multiprocessing.Pool(multiprocessing.cpu_count())
+
+  for key in dataset_dict.keys() :
+    sample = key
+    ntuple_path = dataset_dict[key]
+    for channel in channels :
+      p.apply_async(process,[sample,ntuple_path,channel])
+      pass
+  p.close()
+  p.join()
