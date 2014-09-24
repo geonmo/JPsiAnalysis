@@ -29,9 +29,7 @@ class NtupleAnalyzer(object):
             else :
               self.isMC = "MC"
               break
-          #print self.isMC
           hNEvent = f.Get("fEvent/hNEvent")
-          #print hNEvent
           if hNEvent == None: 
              continue
           self.nEventTotal += hNEvent.GetBinContent(1)
