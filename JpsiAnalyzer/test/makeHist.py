@@ -4,12 +4,10 @@ import os
 from NtupleAnalyzer import *
 import multiprocessing
 
-def process( sample, hltPath,files, weightVar ='puWeight') :
+def process( sample, mode,files, weightVar ='puWeight') :
   print "Making histogram %s"%sample
-  ana = NtupleAnalyzer( hltPath,files,'hist/%s__%s.root'%(sample,hltPath) )
-  #print ana
+  ana = NtupleAnalyzer( mode, files,'hist/%s__%s.root'%(sample,mode) )
   ana.setWeightVar(weightVar)
-  #ana.setPrecut(hltPath)
 
   #cut_s0="1"
   cut_s1="1"
@@ -17,13 +15,13 @@ def process( sample, hltPath,files, weightVar ='puWeight') :
   #cut_s3 = "jets_pt[0] >=30"
   #cut_s4="@jpsiMuMu_pt.size()>=1 && jpsiMuMu_m>3.0 && jpsiMuMu_m<3.2"
   #cut_s5="jpsiMuMu_l3D<2.0 && jpsiMuMu_jetDR<0.5 && jpsiMuMu_vProb>0.001"
-  if ( hltPath == "HLTMuMu" ) :
+  if ( mode == "MuMu" ) :
     cut_s1 = "muons_pt[0]>20. && muons_pt[1]>20. && muons_relIso[0]<0.15 && muons_relIso[1]<0.15"
     cut_s2 = "1"
-  elif ( hltPath == "HLTElEl") :
+  elif ( mode == "ElEl") :
     cut_s1 = "electrons_pt[0]>20. && electrons_pt[1]>20. && electrons_relIso[0]<0.15 && electrons_relIso[1]<0.15"
     cut_s2 = "1"
-  elif ( hltPath == "HLTMuEG" ) :
+  elif ( mode == "MuEl" ) :
     cut_s1 = "muons_pt[0]>20. && muons_relIso[0]<0.15 && electrons_pt[0]>20. && electrons_relIso[0]<0.15"
     cut_s2 = "1"
       
@@ -40,7 +38,7 @@ def process( sample, hltPath,files, weightVar ='puWeight') :
   
 
   ana.addH1("jpsiMuMu_pt","jpsiMuMu_pt","Jpsi pT from MuMu ",100,0. ,200. )
-  ana.addH1("nJpsi","@jpsiMuMu_pt.size()","# of Jpsi from MuMu ",10,0,10 )
+  ana.addH1("nJpsi","@jpsiMuMu_pt.size()","#  f Jpsi from MuMu ",10,0,10 )
   ana.addH1("jpsi_mass","jpsis_m","J/#psi mass (GeV/c^{2})",20,3.0,3.2);
 
   ana.addH1("nVertex", "nVertex", "nVertex;Vertex multiplicity;Events", 60, 0, 60)
@@ -56,60 +54,36 @@ def process( sample, hltPath,files, weightVar ='puWeight') :
   ana.process()
 
 if __name__ == '__main__' :
-  ntuple_dir = '/pnfs/user/kraft_data/'
-  mc_dir = ntuple_dir+'/MC/'
-  rd_dir = ntuple_dir+'/RD/'
-
-  samples ={}
-  dirs = os.listdir(mc_dir)
-  for dir in dirs :
-    filename = mc_dir+'/'+dir+'/ntuple.root'
-    if ( os.path.exists( filename ) ) :
-      samples[dir] =  [filename]
-
-  dirs = os.listdir(rd_dir)
-  for dir in dirs :
-    filename = rd_dir+'/'+dir+'/ntuple.root'
-    if ( os.path.exists( filename ) ) :
-      samples[dir] =  [filename]
-
+  samples = {}
+  modes = ["MuMu","MuEl","ElEl"]
+  for mode in modes  :
+    for f in os.listdir("ntuple"):
+      if len(f) <12 : continue
+      if f[-11:] != ("__%s.root"%mode) : continue
+      s = f.replace("__%s.root"%mode,"")
+      sampleName = (s, mode)
+      if sampleName not in samples: samples[sampleName] = []
+      samples[sampleName].append("ntuple/%s" % f)
+  
   #print samples
 
-  ## for test,
-  samples ={'default':['./ntuple/ntuple.root']}
-  modes = ["HLTMuMu","HLTElEl","HLTMuEG"]
-
-
-
-
-  #for mode in modes :
   p = multiprocessing.Pool(multiprocessing.cpu_count())
-  for key in samples.keys():
+  for key in samples.keys() :
     sample = key
     files = samples[key]
     for mode in modes :
-      p.apply_async(process, [sample, mode, files])
+      p.apply_async(process, [sample[0], mode, files])
+      #print  sample[0], mode, files
       pass
   p.close()
   p.join() 
-
-  for sample in samples :
-    if 'Run20' in sample : continue
-    cmd = ("hadd -f hist/%s__All.root hist/%s__HLTMuMu.root hist/%s__HLTElEl.root hist/%s__HLTMuEG.root" % (sample, sample, sample, sample))
-    os.system(cmd)
-    break
-  for sample in samples :
-    if('Run20' in sample ):  
-      cmd1 =("hadd -f hist/Run2012__HLTElEl.root hist/DoubleElectron_Run2012*-22Jan2013__HLTElEl.root")
-      cmd2 =("hadd -f hist/Run2012__HLTMuMu.root hist/DoubleMu_Run2012*-22Jan2013__HLTMuMu.root")
-      cmd3 =("hadd -f hist/Run2012__HLTMuEG.root hist/MuEG_Run2012*-22Jan2013__HLTMuEG.root")
-      cmd4 =("hadd -f hist/Run2012__All.root hist/Run2012__HLTMuMu.root hist/Run2012__HLTElEl.root hist/Run2012__HLTMuEG.root")
-      
-      os.system( cmd1 ) 
-      os.system( cmd2 ) 
-      os.system( cmd3 ) 
-      os.system( cmd4 )
-      break 
-
-
-
+  """
+  for sample, mode in samples.keys():
+    if 'Run20' in sample: continue
+    os.system("hadd -f hist/%s__All.root hist/%s__MuMu.root hist/%s__ElEl.root hist/%s__MuEl.root" % (sample, sample, sample, sample))
+  os.system("hadd -f hist/Run2012__ElEl.root hist/DoubleElectron_Run2012*-22Jan2013__ElEl.root")
+  os.system("hadd -f hist/Run2012__MuMu.root hist/DoubleMu_Run2012*-22Jan2013__MuMu.root")
+  os.system("hadd -f hist/Run2012__MuEl.root hist/MuEG_Run2012*-22Jan2013__MuEl.root")
+  os.system("hadd -f hist/Run2012__All.root hist/Run2012__MuMu.root hist/Run2012__ElEl.root hist/Run2012__MuEl.root")
+  print "END"
+  """

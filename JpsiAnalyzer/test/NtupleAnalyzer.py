@@ -17,6 +17,8 @@ class NtupleAnalyzer(object):
         self.chain=TChain('fEvent/event')
         ## Load input tree and event number for scalers
         self.nEventTotal = 0
+        print modeName, inFileNames, outFileName
+
         for inFileName in inFileNames:
           f = TFile(inFileName)
           if f == None: continue
