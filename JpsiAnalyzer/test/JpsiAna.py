@@ -33,8 +33,6 @@ class JpsiAna :
     self.outFile = TFile(outFileName, "RECREATE")
     self.outDir = self.outFile
     self.outDir.cd()
-    self.nJpsi = [ TH1F(), TH1F(), TH1F(), TH1F(), TH1F() ]
-    self.nMuon = [ TH1F(), TH1F(), TH1F(), TH1F(), TH1F() ]
     self.HistBooking()
     self.hNEvent = TH1F("step","step",7,0,7)
     self.hNEvent.GetXaxis().SetBinLabel(1,"Total")
@@ -51,8 +49,9 @@ class JpsiAna :
     self.hNEvent.Fill(0,self.nEventTotal)
     self.hWeight.Fill(0,self.nEventTotal)
 
-  def addHist( self, hist) :
-    self.hist[name] = hist
+  def addH1( self, name, title, binx, xmin, xmax) :
+    hist = TH1F(name, title, binx, xmin, xmax)
+    self.hist[name] = [hist.Clone(),hist.Clone(),hist.Clone(),hist.Clone(),hist.Clone()]
 
   def HistBooking(self) :
     self.outFile.mkdir("S1")
@@ -61,85 +60,71 @@ class JpsiAna :
     self.outFile.mkdir("S4")
     self.outFile.mkdir("S5")
 
-    hist_nJpsi = TH1F("nJpsi","# of J/#psi meson",10,0,10)
-    hist_nMuon = TH1F("nMuon","# of Muon",10,0,10)
-    for i in range(5) :
-      self.nJpsi[i] = hist_nJpsi.Clone()
-      self.nMuon[i] = hist_nMuon.Clone()
-      self.outFile.cd()
+    self.addH1("nMuon","Number of Muons",10,0,10)
+    self.addH1("nJpsi","Number of J/#psi meson",10,0,10)
+
+    self.addH1("JPsiMass","JPsi Mass;J/#psi mass [GeV];Events",20,3.0,3.2)
+    self.addH1("JPsiPt","JPsi Pt;J/#psi Pt [GeV];Events",28,0,140.)
+    self.addH1("JPsiEta", "JPsi #eta;J/#psi #eta ;Events", 25, -2.5, 2.5)
+    self.addH1("JPsiPhi", "JPsi #phi;J/#psi #phi ;Events", 100, -TMath.Pi(), TMath.Pi())
+    self.addH1("JPsil3D", "JPsidlPV;3D distance PV-J/#psi vertex [cm];Events", 22,0,2.2)
+    self.addH1("JPsiMinDR", "JPsiJetMinDR;#Delta R(J/#psi-jet) min;Events", 20,0.0,2.0)
+    self.addH1("JPsivProb","JPsivProb;J/#psi vertex prob.;Events", 10, 0.0, 1)
+
+    self.addH1("l1JpsiMass","Lepton + J/#psi Mass; l+J/#psi Mass; Gev/c^2",100,0,100)
+    self.addH1("l2JpsiMass","Lepton + J/#psi Mass; l+J/#psi Mass; Gev/c^2",100,0,100)
 
   def FillHist( self, ev, passed) :
     weight = ev.puWeight
     jpsi_list = self.ev_info.jpsi_list
+    lep1 = self.ev_info.lep1
+    lep2 = self.ev_info.lep2
     for i in range(passed) :
-      self.nJpsi[i].Fill( len( self.ev_info.jpsi_list),weight )
-      self.nMuon[i].Fill( len( self.ev_info.muon_list),weight )
+      self.hist["nJpsi"][i].Fill( len( self.ev_info.jpsi_list),weight )
+      self.hist["nMuon"][i].Fill( len( self.ev_info.muon_list),weight )
       self.hNEvent.Fill( i+2.5 )
       self.hWeight.Fill( i+2.5, weight )
-      if( passed ==5 ) : 
-        print "passed 5!  ",i+2.5 
-
-  """ 
-  def InitEvent( self, ev ) :
-    lep_list = []
-    muon_list =[]
-    elec_list =[]
-    jet_list = []
-    jpsi_list =[]
-    jpsimm_list =[]
-    jpsiee_list =[]
-    for i in range( len( ev.muons_pt) ) :
-      temp_muon = Lepton( ev.muons_pt[i], ev.muons_eta[i], ev.muons_phi[i], ev.muons_m[i], ev.muons_q[i], ev.muons_relIso[i], 'm',ev.muons_isLoose[i], 1)
-      muon_list.append( temp_muon )
-      lep_list.append( temp_muon ) 
-    
-    for i in range( len( ev.electrons_pt) ) :
-      temp_elec =  Lepton( ev.electrons_pt[i], ev.electrons_eta[i], ev.electrons_phi[i], ev.electrons_m[i], ev.electrons_q[i], ev.electrons_relIso[i], 'm',1, ev.electrons_mva[i])
-      elec_list.append( temp_elec)
-      lep_list.append( temp_elec)
-    for i in range( len ( ev.jets_pt) ) :
-      jet_list.append( Jet(ev.jets_pt[i], ev.jets_eta[i], ev.jets_phi[i], ev.jets_m[i], ev.jets_bTagCSV[i]))
-   
-    for i in range( len( ev.jpsiMuMu_pt) ) :
-      temp_jpsi = Jpsi( ev.jpsiMuMu_pt[i], ev.jpsiMuMu_eta[i], ev.jpsiMuMu_phi[i], ev.jpsiMuMu_m[i], ev.jpsiMuMu_vProb[i], ev.jpsiMuMu_l3D[i])
-      jpsi_list.append(temp_jpsi)
-      jpsimm_list.append(temp_jpsi)
-
-    for i in range( len( ev.jpsiElEl_pt) ) :
-      temp_jpsi =  Jpsi( ev.jpsiElEl_pt[i], ev.jpsiElEl_eta[i], ev.jpsiElEl_phi[i], ev.jpsiElEl_m[i], ev.jpsiElEl_vProb[i], ev.jpsiElEl_l3D[i])
-      jpsi_list.append( temp_jpsi)
-      jpsiee_list.append( temp_jpsi)
-
-    return muon_list, elec_list , jet_list, jpsimm_list, jpsiee_list
-
-  """
+      if ( len(jpsi_list) > 0) : print "passed : ",passed," jpsi : ",len(jpsi_list)
+      for jpsi in jpsi_list :
+        self.hist["JPsiMass"][i].Fill( jpsi.M() )
+        self.hist["JPsiPt"][i].Fill( jpsi.Pt() )
+        self.hist["JPsiEta"][i].Fill( jpsi.Eta() )
+        self.hist["JPsiPhi"][i].Fill( jpsi.Phi() )
+        self.hist["JPsil3D"][i].Fill( jpsi.l3D )
+        self.hist["JPsiMinDR"][i].Fill( jpsi.minDR)
+        self.hist["JPsivProb"][i].Fill( jpsi.vProb)
+        self.hist["l1JpsiMass"][i].Fill( (jpsi+lep1).M() )
+        self.hist["l2JpsiMass"][i].Fill( (jpsi+lep2).M() )
 
   def process( self) :
     for ev in self.chain :
-      self.ev_info = EventContent(ev) 
-      #muon_list, elec_list, jet_list, jpsimm_list, jpsiee_list = self.InitEvent( ev )
+      self.ev_info = EventContent(ev,self.mode) 
       lep_list  = self.ev_info.lep_list
-      jpsi_list = self.ev_info.jpsi_list
       cleanedJet = self.ev_info.cleanedJet_list
+      jpsi_list = self.ev_info.jpsi_list
+
       if ( len( lep_list ) <2 ) : continue
       lep1 = lep_list[0]
-      #ev_flag = Flag()
       max_passed = 0
       for lep2 in lep_list[1:] :
         cf = CutFlow( lep1, lep2 )
         passed = 0
-        if ( cf.Step1() ) : passed = 1
-        if ( cf.Step1() and cf.Step2() ) : passed = 2
-        if ( cf.Step1() and cf.Step2() and cf.Step3(len(cleanedJet )) ) : passed = 3
-        if ( cf.Step1() and cf.Step2() and cf.Step3(len(cleanedJet )) and cf.Step4( jpsi_list ) )  : passed = 4
-        if ( cf.Step1() and cf.Step2() and cf.Step3(len(cleanedJet )) and cf.Step4( jpsi_list ) and cf.Step5( jpsi_list ) ) : passed = 5
-        
+        if ( not cf.Step1() ) : 
+          passed = 0
+        elif ( not cf.Step2() ) : 
+          passed = 1
+        elif ( not cf.Step3(len(cleanedJet )) ) : 
+          passed = 2
+        elif ( not cf.Step4( jpsi_list ) )  : 
+          passed = 3
+        elif ( not cf.Step5( jpsi_list ) ) : 
+          passed = 4
+        else :
+          passed = 5
         if ( passed > max_passed) : max_passed = passed
   
-      if ( max_passed ==5 ) : print "event : ",ev.event,"  is passed to step 5"
- 
-      self.hNEvent.Fill( 1 )
-      self.hWeight.Fill( 1, ev.puWeight )
+      self.hNEvent.Fill( 1.5 )
+      self.hWeight.Fill( 1.5 , ev.puWeight )
       self.FillHist( ev, max_passed) 
 
     self.Write()
@@ -149,8 +134,8 @@ class JpsiAna :
     self.hWeight.Write()
     for i in range(5) :
       self.outFile.cd("S%d"%(i+1))
-      self.nMuon[i].Write()
-      self.nJpsi[i].Write()
+      for name in self.hist.keys() :
+        self.hist[name][i].Write()
 
   def Print(self) :
     print self.inputFiles
@@ -165,8 +150,6 @@ if __name__ == "__main__" :
   ntuples = ["ntuple/WW_TuneZ2star_8TeV_pythia6_tauola__MuMu.root"]
   ana = JpsiAna(ntuples,"MuMu","hist.root")
 
-  #ana.Print()
   ana.process()
-  #ana.Write()
 
 

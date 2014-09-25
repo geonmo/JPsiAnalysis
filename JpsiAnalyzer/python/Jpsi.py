@@ -12,4 +12,4 @@ class Jpsi(TLorentzVector) :
     for jet in jet_list :
       deltaR = self.DeltaR( jet)
       if ( deltaR < self.minDR ) : self.minDR = deltaR
-    return deltaR
+    #return deltaR

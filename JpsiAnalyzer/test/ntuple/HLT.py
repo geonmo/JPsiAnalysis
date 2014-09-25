@@ -10,8 +10,10 @@ def process( dataset, ntuple_path, channel ) :
     expr = "@muons_pt.size()>=2"
   elif ( channel == "ElEl") :
     expr = "@electrons_pt.size() >=2"
-  elif ( channel == "MuEG") :
+  elif ( channel == "MuEl") :
     expr = "@electrons_pt.size() >=1&&@muons_pt.size()>=1" 
+  else : 
+    return
 
   file = TFile(ntuple_path)
   filename = dataset+"__"+channel+".root"
@@ -53,8 +55,8 @@ if __name__ == '__main__' :
     #print count
     #count=count+1
     for channel in channels :
-      p.apply_async(process,[sample,ntuple_path,channel])
       print sample,ntuple_path,channel
+      p.apply_async(process,[sample,ntuple_path,channel])
       pass
   p.close()
   p.join()
