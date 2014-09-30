@@ -31,11 +31,13 @@ process.partons = cms.EDProducer("GenParticlePruner",
     ),
 )
 
+
 process.GEN = cms.Path(
     process.pseudoTop
   + process.partons
   * process.flatPseudoTopLepton + process.flatPseudoTopNu + process.flatPseudoTopJet
 )
+
 
 process.CANDSEL = cms.Path(
     process.preFilterSequence
@@ -44,9 +46,11 @@ process.CANDSEL = cms.Path(
 )
 
 process.out.SelectEvents.SelectEvents.append("GEN")
-#process.out.outputCommands.extend(["keep *_good*_*_*"])
 process.output = cms.EndPath(process.out)
+
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
 )
+
+#process.GlobalTag.globaltag = cms.string('START53_V27::All')
