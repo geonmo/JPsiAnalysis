@@ -10,8 +10,6 @@ process.source = cms.Source("PoolSource",
 
 process.load("KrAFT.GenericNtuple.flatNtuple_cfi")
 process.load("KrAFT.GenericNtuple.flatCands_cfi")
-#process.load("KrAFT.RecoSelectorTools.zSelector_cfi")
-#process.load("KrAFT.GenericNtuple.flatZNtuple_cfi")
 process.passFEDM = cms.EDFilter("HLTHighLevel",
     eventSetupPathsKey = cms.string(''),
     TriggerResultsTag = cms.InputTag("TriggerResults","","KrAFT"),
@@ -22,10 +20,7 @@ process.passFEDM = cms.EDFilter("HLTHighLevel",
     andOr = cms.bool(True)
 )
 
-#process.p = cms.Path(process.passFEDM+process.fEvent)
 process.p = cms.Path( process.passFEDM
-                      #*process.ZToMuMuCandidates*process.flatZMuMu
-                      #+process.ZToElElCandidates*process.flatZElEl
                       +process.fEvent
 )
 
@@ -40,8 +35,6 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string("ntuple_ttbar.root"),
 )
 
-#setattr( process.fEvent.cands,"zMuMu",process.zMuMu)
-#setattr( process.fEvent.cands,"zElEl",process.zElEl)
 
 HLTMuMu = cms.PSet( src = cms.InputTag("flatEventInfo","HLTDoubleMu"))
 HLTElEl = cms.PSet( src = cms.InputTag("flatEventInfo","HLTDoubleElectron"))
