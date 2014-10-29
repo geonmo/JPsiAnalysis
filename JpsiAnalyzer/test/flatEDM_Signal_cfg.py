@@ -9,10 +9,11 @@ customisePAT(process, runOnMC=runOnMC, outputModules=[])
 process.source.fileNames = [
     #'/store/relval/CMSSW_5_3_12_patch2/RelValProdTTbar/GEN-SIM-RECO/START53_LV2-v1/00000/5E865D62-AA2B-E311-AA04-002618943962.root',
     #'/store/relval/CMSSW_5_3_12_patch2/RelValProdTTbar/GEN-SIM-RECO/START53_LV2-v1/00000/92EB24DF-C72B-E311-8AA2-00261894390E.root',
+    '/store/mc/Summer12_DR53X/TTJets_FullLeptMGDecays_8TeV-madgraph-tauola/AODSIM/PU_S10_START53_V7C-v2//10000/52621B1D-1998-E211-B9A0-0025905938B4.root',
 		#'file:fulllepton.root',
     #'file:0000CAC5-D4DA-E111-8872-00A0D1EEF328.root',
-    'file:/pnfs/user/youngjo/topref/ttbar_01.root',
-    'file:/pnfs/user/youngjo/topref/ttbar_02.root'
+    #'file:/pnfs/user/youngjo/topref/ttbar_01.root',
+    #'file:/pnfs/user/youngjo/topref/ttbar_02.root'
 ]
 
 process.load("KrAFT.Configuration.flatEDM_MC_cff")
@@ -50,7 +51,7 @@ process.output = cms.EndPath(process.out)
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(100)
 )
 
 #process.GlobalTag.globaltag = cms.string('START53_V27::All')
