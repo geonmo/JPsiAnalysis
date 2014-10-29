@@ -49,7 +49,7 @@ class EventContent :
 
   def InitJet( self ) :
     for i in range( len ( self.ev.jets_pt) ) :
-      self.jet_list.append( Jet(self.ev.jets_pt[i], self.ev.jets_eta[i], self.ev.jets_phi[i], self.ev.jets_m[i], self.ev.jets_bTagCSV[i]))
+      self.jet_list.append( Jet(self.ev.jets_pt[i], self.ev.jets_eta[i], self.ev.jets_phi[i], self.ev.jets_m[i], self.ev.jets_bTagCSV[i], self.ev.jets_dn[i], self.ev.jets_resDn[i]))
     self.JetCleaning()
 
   def InitJpsi( self): 
