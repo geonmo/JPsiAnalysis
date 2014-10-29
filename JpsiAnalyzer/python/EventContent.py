@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from ROOT import *
+from JPsiAnalysis.JpsiAnalyzer.Muon import Muon
+from JPsiAnalysis.JpsiAnalyzer.Electron import Electron
 from JPsiAnalysis.JpsiAnalyzer.Lepton import Lepton
 from JPsiAnalysis.JpsiAnalyzer.Jet import Jet
 from JPsiAnalysis.JpsiAnalyzer.CutFlow import *
@@ -26,11 +28,11 @@ class EventContent :
 
   def InitMuon( self ) :
     for i in range( len( self.ev.muons_pt) ) :
-      temp_muon = Lepton( self.ev.muons_pt[i], self.ev.muons_eta[i], self.ev.muons_phi[i], self.ev.muons_m[i], self.ev.muons_q[i], self.ev.muons_relIso[i], 'm',self.ev.muons_isLoose[i], 1)
+      temp_muon = Muon( self.ev.muons_pt[i], self.ev.muons_eta[i], self.ev.muons_phi[i], self.ev.muons_m[i], self.ev.muons_q[i], self.ev.muons_relIso[i], 'm',self.ev.muons_isLoose[i])
       self.muon_list.append( temp_muon )
   def InitElectron( self ) :
       for i in range( len( self.ev.electrons_pt) ) :
-        temp_elec =  Lepton( self.ev.electrons_pt[i], self.ev.electrons_eta[i], self.ev.electrons_phi[i], self.ev.electrons_m[i], self.ev.electrons_q[i], self.ev.electrons_relIso[i], 'e',1, self.ev.electrons_mva[i])
+        temp_elec =  Electron( self.ev.electrons_pt[i], self.ev.electrons_eta[i], self.ev.electrons_phi[i], self.ev.electrons_m[i], self.ev.electrons_q[i], self.ev.electrons_relIso[i], 'e', self.ev.electrons_mva[i], self.ev.electrons_conversionVeto[i], self.ev.electrons_scEta[i], self.ev.electrons_isPF[i] )
         self.elec_list.append( temp_elec)
 
   def InitLepton( self ) :
