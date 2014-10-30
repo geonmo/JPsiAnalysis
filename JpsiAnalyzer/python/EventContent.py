@@ -23,8 +23,11 @@ class EventContent :
     self.InitLepton()
     self.InitJet()
     self.InitJpsi()
-    self.lep1 = self.lep_list[0]
-    self.lep2 = self.lep_list[1]
+    if len(self.lep_list) >=2 :
+      self.lep1 = self.lep_list[0]
+      self.lep2 = self.lep_list[1]
+    else :
+      pass
 
   def InitMuon( self ) :
     for i in range( len( self.ev.muons_pt) ) :
