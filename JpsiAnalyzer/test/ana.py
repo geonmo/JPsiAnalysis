@@ -12,18 +12,18 @@ def process( sample, mode, files, weightVar ='puWeight') :
   ana.process()
 
 if __name__ == '__main__' :
+  ntuple_dir= "/cms/data/xrd/store/user/geonmo/ntuple_MC_new/"
   samples = {}
   modes = ["MuMu","MuEl","ElEl"]
+  for mode in modes :
+    for dir in os.listdir(ntuple_dir) :
+      sampleName = (dir, mode)
+      if sampleName not in samples :
+        samples[sampleName] = []
+      for x in os.listdir( ntuple_dir+dir) :
+        samples[sampleName].append(ntuple_dir+dir+'/'+x)
   print "loop"
-  for mode in modes  :
-    for f in os.listdir("ntuple"):
-      if len(f) <12 : continue
-      if f[-11:] != ("__%s.root"%mode) : continue
-      s = f.replace("__%s.root"%mode,"")
-      sampleName = (s, mode)
-      if sampleName not in samples: samples[sampleName] = []
-      samples[sampleName].append("ntuple/%s" % f)
-  
+  print samples
   p = multiprocessing.Pool(multiprocessing.cpu_count())
   for key in samples.keys() :
     sample = key
