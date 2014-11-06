@@ -84,7 +84,7 @@ class JpsiAna :
       self.hist["nMuon"][i].Fill( len( self.ev_info.muon_list),weight )
       self.hNEvent.Fill( i+2.5 )
       self.hWeight.Fill( i+2.5, weight )
-      if ( len(jpsi_list) > 0) : print "passed : ",passed," jpsi : ",len(jpsi_list)
+      #if ( len(jpsi_list) > 0) : print "passed : ",passed," jpsi : ",len(jpsi_list)
       for jpsi in jpsi_list :
         self.hist["JPsiMass"][i].Fill( jpsi.M() )
         self.hist["JPsiPt"][i].Fill( jpsi.Pt() )

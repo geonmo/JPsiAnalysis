@@ -46,7 +46,7 @@ for cutStep in sorted(histStr.keys()):
         c.Divide(2,2)
         plotSet = [c]
         ymax = 0.0
-        for i, channel in enumerate(("HLTMuMu", "HLTElEl", "HLTMuEG", "All")):
+        for i, channel in enumerate(("MuMu", "ElEl", "MuEl", "All")):
             hists = []
             hStack = None
             ymaxStack = 0.0
